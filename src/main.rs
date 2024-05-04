@@ -28,8 +28,9 @@ bind_interrupts!(struct Irqs {
 #[embassy_executor::task]
 async fn pio_task_sm0(mut sm: StateMachine<'static, PIO1, 0>) {
     Timer::after_secs(5).await;
+    sm.set_enable(true);
     loop {
-        sm.set_enable(true);
+        // sm.restart();
         unsafe {
             sm.exec_instr(0x0000);
         }
@@ -38,7 +39,7 @@ async fn pio_task_sm0(mut sm: StateMachine<'static, PIO1, 0>) {
 
         let mut dht11_data_buf: [u8; 5] = [0; 5];
         for item in &mut dht11_data_buf {
-            *item = sm.rx().wait_pull().await as u8;
+            *item = sm.rx().pull() as u8;
         }
         let mut data_checksum = 0u8;
         for item in dht11_data_buf.iter().take(4) {
@@ -49,7 +50,7 @@ async fn pio_task_sm0(mut sm: StateMachine<'static, PIO1, 0>) {
         } else {
             warn!("Failed to properly read temp data {:?}", dht11_data_buf);
         }
-        sm.set_enable(false);
+        // sm.set_enable(false);
         // sm.restart();
 
         Timer::after_secs(1).await
@@ -79,8 +80,10 @@ async fn main(spawner: Spawner) {
     cfg.set_set_pins(&[&data_pin]);
     cfg.set_in_pins(&[&data_pin]);
     cfg.set_jmp_pin(&data_pin);
-    cfg.clock_divider = 10.to_fixed();
-    // cfg.clock_divider = U56F8!(7.5).to_fixed();
+    // x&y are set to 31 in the pio program, this helps initialize a loop of 1024*100 cycles which needs to add up to ~20ms according to whoever wrote it.
+    // Cursory examination indicated a system clock frequency of 125MHz
+    // 102400 cycles / 20ms = 5.12 MHz -> 125MHz/5.12MHz = 24.414, thus a clock divider of near to 24.414
+    cfg.clock_divider = 25.to_fixed();
     cfg.shift_in.auto_fill = true;
     cfg.shift_in.threshold = 8;
     sm0.set_config(&cfg);
