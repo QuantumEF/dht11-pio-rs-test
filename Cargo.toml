@@ -1,6 +1,6 @@
 [package]
 edition = "2021"
-name = "dht11-test"
+name = "dht11-rs-example"
 version = "0.1.0"
 authors = ["Erik Fong <quantumerikfong@gmail.com>"]
 resolver = "2"
