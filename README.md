@@ -1,4 +1,4 @@
-A rust example of reading a DHT11 temperature and humidity sensor using [Embassy](https://embassy.dev/) and [PIO](https://www.raspberrypi.com/news/what-is-pio/).
+A rust example of reading a [DHT11 temperature and humidity sensor](https://components101.com/sensors/dht11-temperature-sensor) using [Embassy](https://embassy.dev/) and [PIO](https://www.raspberrypi.com/news/what-is-pio/).
 
 The PIO assemby is adapted from the following repo: https://github.com/ashchap/PIO_DHT11_Python/blob/main/src/dht11.py
 
