@@ -5,20 +5,15 @@
 
 use defmt::*;
 use embassy_executor::Spawner;
-use embassy_rp::i2c::{self, Config};
 use embassy_time::Timer;
-use embedded_hal_1::i2c::I2c;
 use {defmt_rtt as _, panic_probe as _};
 
 use embassy_rp::bind_interrupts;
 use embassy_rp::peripherals::{PIO0, PIO1};
 
-use embassy_rp::pio::{
-    Common, Config as PIOConfig, InterruptHandler, Pio, PioPin, ShiftDirection, StateMachine,
-};
+use embassy_rp::pio::{Config as PIOConfig, InterruptHandler, Pio, PioPin, ShiftDirection};
 
 use fixed::traits::ToFixed;
-use fixed_macro::types::U56F8;
 
 bind_interrupts!(struct Irqs {
     PIO0_IRQ_0 => InterruptHandler<PIO0>;
@@ -30,7 +25,6 @@ async fn dht11_task(pio: Pio<'static, PIO1>, pin: impl PioPin) {
     let prg = pio_proc::pio_file!("src/dht11.pio");
     let Pio {
         mut common,
-        irq3,
         mut sm0,
         ..
     } = pio;
