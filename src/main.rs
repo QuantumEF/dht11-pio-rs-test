@@ -54,7 +54,10 @@ async fn dht11_task(pio: Pio<'static, PIO1>, pin: impl PioPin) {
         for item in &mut dht11_data_buf {
             *item = sm0.rx().pull();
         }
-        info!("Data {:x}", dht11_data_buf);
+        info!(
+            "Temperature {}°C, Humidity: {}%",
+            dht11_data_buf[2], dht11_data_buf[0]
+        );
         sm0.restart();
         Timer::after_secs(1).await
     }
